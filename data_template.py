@@ -23,9 +23,7 @@ data_report = {
     '_token': '',
     'start_date': '',
     'end_date': '',
-    "return_college[]": '东校区',
-    'return_college[]': '西校区',
-    'return_college[]': '中校区'
+    "return_college[]": ['西校区', '东校区', '中校区'],
 }
 
 STUID = '学号'
