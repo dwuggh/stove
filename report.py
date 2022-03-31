@@ -13,6 +13,8 @@ class Reporter(object):
     def __init__(self, stuid, password):
         self.stuid = stuid
         self.password = password
+        self.ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+        
 
     def report(self, data_daily, data_report):
         loginsuccess = False
@@ -36,7 +38,7 @@ class Reporter(object):
 
         data_daily['_token'] = token
         headers = {
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+            'user-agent': self.ua,
             'origin': 'https://weixine.ustc.edu.cn',
             'referer': 'https://weixine.ustc.edu.cn/2020/home',
             }
@@ -63,20 +65,25 @@ class Reporter(object):
             data=data_report,
             headers=headers
             )
+        status = self.check_status(session)
         if resp.status_code != 200:
             print("auto report failed on requesting auth: response with status code %d" % resp.status_code)
+            return False
+        elif not status == '在校可跨校区':
+            print("autoreport might not work as expected: your status is %s" % status)
             return False
         else:
             print("report success!")
             return True
         
 
+
     def login(self):
         url = "https://passport.ustc.edu.cn/login?service=http%3A%2F%2Fweixine.ustc.edu.cn%2F2020%2Fcaslogin"
         headers = {
             'origin': 'https://passport.ustc.edu.cn',
             'referer': url,
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+            'user-agent': self.ua
         }
         session = requests.Session()
 
@@ -103,6 +110,15 @@ class Reporter(object):
 
         session.post('https://passport.ustc.edu.cn/login', data=data, headers=headers)
         return session
+
+    def check_status(self, session):
+        resp = session.get('https://weixine.ustc.edu.cn/2020/apply_total', headers={
+            'user-agent': self.ua
+        })
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        res = list(soup.find(id="table-box").find_all('p')[2])[1].string
+        return res
+        
 
 
 def main():
