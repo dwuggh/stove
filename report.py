@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from typing import Protocol
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import pytz
 import time
 import random
+import sys
 
 
 class Reporter(object):
@@ -35,7 +35,6 @@ class Reporter(object):
         token = soup.find("input", {"name": "_token"})['value']
 
         data_daily['_token'] = token
-        # print(data_daily)
         headers = {
             'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
             'origin': 'https://weixine.ustc.edu.cn',
@@ -59,7 +58,6 @@ class Reporter(object):
         data_report['_token'] = token
         data_report['start_date'] = start
         data_report['end_date'] = end
-        # print(data_report)
         resp = session.post(
             'https://weixine.ustc.edu.cn/2020/apply/daliy/post',
             data=data_report,
@@ -103,30 +101,12 @@ class Reporter(object):
             'button': '',
         }
 
-        resp = session.post('https://passport.ustc.edu.cn/login', data=data, headers=headers)
+        session.post('https://passport.ustc.edu.cn/login', data=data, headers=headers)
         return session
 
 
 def main():
     import data
-    # with open('/root/autoreport/accounts.txt') as f:
-    #     lines = list(f.readlines())
-    #     for i, line in enumerate(lines):
-    #         id, password = line.strip().split(' ')
-    #         reporter = Reporter(id, password)
-
-    #         count = 1
-    #         while count != 0:
-    #             ret = reporter.report()
-    #             if ret != False:
-    #                 break
-    #             print("Report Failed, retry...")
-    #             count = count - 1
-    #             if count == 0:
-    #                 print("report failed for %s" % id)
-                    
-    #         if i < len(lines) - 1:
-    #             time.sleep(random.uniform(600, 1200))
     reporter = Reporter(data.STUID, data.PASSWORD)
     count = 5
     while count != 0:
@@ -142,8 +122,10 @@ def main():
             
 
 if __name__ == '__main__':
-    random_start = False
-    if random_start:
-        time.sleep(random.uniform(300, 1800))
+    argv = sys.argv
+    argc = len(argv)
+    if argc > 1:
+        t = int(argv[1])
+        time.sleep(random.uniform(0, t))
     main()
 
