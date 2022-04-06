@@ -24,6 +24,7 @@ data_report = {
     'start_date': '',
     'end_date': '',
     "return_college[]": ['西校区', '东校区', '中校区'],
+    "reason": "跨校区"
 }
 
 STUID = '学号'
