@@ -61,7 +61,7 @@ class Reporter(object):
         data_report['start_date'] = start
         data_report['end_date'] = end
         resp = session.post(
-            'https://weixine.ustc.edu.cn/2020/apply/daliy/post',
+            'https://weixine.ustc.edu.cn/2020/apply/daliy/ipost',
             data=data_report,
             headers=headers
             )
