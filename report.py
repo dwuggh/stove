@@ -48,6 +48,8 @@ class Reporter(object):
             print("auto report failed on reporting: response with status code %d" % resp.status_code)
             return False
 
+        print("上传行程卡...")
+        self.upload_img(session, token, 'photo.jpg')
         
         getform = session.get('https://weixine.ustc.edu.cn/2020/apply/daliy/i?t=3')
         data = getform.text.encode('ascii', 'ignore').decode('utf-8', 'ignore')
@@ -87,6 +89,10 @@ class Reporter(object):
         }
         session = requests.Session()
 
+        session.headers.update({
+            'user-agent': self.ua
+        })
+
         print("login...")
         # setting cookies
         resp1 = session.get('https://weixine.ustc.edu.cn/2020/login')
@@ -119,6 +125,39 @@ class Reporter(object):
         res = list(soup.find(id="table-box").find_all('p')[2])[1].string
         return res
         
+
+    def upload_img(self, session, token, img):
+        with open(img, 'rb') as f:
+            # content = f.read()
+            data = {
+                "_token": token,
+                "gid": 2201907351,
+                "sign": "0rv+6l1k1K71IgTzjIeHnmGVvK5srtsAN7mf",
+                "t": 1,
+                "id": "WU_FILE_0",
+                "name": "photo.jpg",
+                "type": "image/jpeg",
+                "lastModifiedDate": datetime.now().strftime("%a %b %d %Y %H:%M:%S") + " GMT+0800 (China Standard Time)",
+                # "size": len(content),
+                # "file": content
+                
+                }
+            # print(data)
+            # headers = {
+            #     "content-type": 'multipart/form-data; boundary=----WebKitFormBoundaryMAk7vBQbhtSlDYWB',
+            #     'origin': 'https://weixine.ustc.edu.cn',
+            #     'referer': 'https://weixine.ustc.edu.cn/2020/upload/xcm',
+            #     'user-agent': self.ua
+            # }
+            print(session.cookies)
+            resp = session.post('https://weixine.ustc.edu.cn/2020img/api/upload_for_student', data=data,
+                                files={
+                                    "file": f
+                                }
+                                # headers=headers
+                                )
+            # print(resp.request.header)
+            print(resp.json())
 
 
 def main():
