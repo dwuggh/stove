@@ -7,6 +7,7 @@ import pytz
 import time
 import random
 import sys
+import re
 
 
 class Reporter(object):
@@ -127,13 +128,23 @@ class Reporter(object):
         
 
     def upload_img(self, session, token, img):
+        # get gid and sign
+        resp = session.get("https://weixine.ustc.edu.cn/2020/upload/xcm")
+        data = resp.text.encode('ascii', 'ignore').decode('utf-8', 'ignore')
+        gid = re.search(r"(?<='gid': ').*?(?=')", data).group()
+        sign = re.search(r"(?<='sign': ').*?(?=')", data).group()
+        # print(gid)
+        # print(sign)
+
+
         with open(img, 'rb') as f:
             # content = f.read()
             data = {
                 "_token": token,
-                "gid": 2201907351,
-                "sign": "0rv+6l1k1K71IgTzjIeHnmGVvK5srtsAN7mf",
+                "gid": gid,
+                "sign": sign,
                 "t": 1,
+                # form data of webuploader
                 "id": "WU_FILE_0",
                 "name": "photo.jpg",
                 "type": "image/jpeg",
@@ -142,14 +153,6 @@ class Reporter(object):
                 # "file": content
                 
                 }
-            # print(data)
-            # headers = {
-            #     "content-type": 'multipart/form-data; boundary=----WebKitFormBoundaryMAk7vBQbhtSlDYWB',
-            #     'origin': 'https://weixine.ustc.edu.cn',
-            #     'referer': 'https://weixine.ustc.edu.cn/2020/upload/xcm',
-            #     'user-agent': self.ua
-            # }
-            print(session.cookies)
             resp = session.post('https://weixine.ustc.edu.cn/2020img/api/upload_for_student', data=data,
                                 files={
                                     "file": f
