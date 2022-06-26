@@ -30,3 +30,4 @@ data_report = {
 
 STUID = '学号'
 PASSWORD = '密码'
+photo = '/path/to/行程码'

@@ -11,10 +11,11 @@ import re
 
 
 class Reporter(object):
-    def __init__(self, stuid, password):
+    def __init__(self, stuid, password, photo):
         self.stuid = stuid
         self.password = password
         self.ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+        self.photo = photo
         
 
     def report(self, data_daily, data_report):
@@ -50,7 +51,7 @@ class Reporter(object):
             return False
 
         print("上传行程卡...")
-        self.upload_img(session, token, 'photo.jpg')
+        self.upload_img(session, token, self.photo)
         
         getform = session.get('https://weixine.ustc.edu.cn/2020/apply/daliy/i?t=3')
         data = getform.text.encode('ascii', 'ignore').decode('utf-8', 'ignore')
@@ -165,7 +166,7 @@ class Reporter(object):
 
 def main():
     import data
-    reporter = Reporter(data.STUID, data.PASSWORD)
+    reporter = Reporter(data.STUID, data.PASSWORD, data.photo)
     count = 5
     while count != 0:
         ret = reporter.report(data.data_daily, data.data_report)
